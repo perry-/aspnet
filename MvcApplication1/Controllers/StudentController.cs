@@ -17,12 +17,17 @@ namespace MvcApplication1.Controllers
         //
         // GET: /Student/
 
-        public ActionResult Index(string sortOrder)
+        public ActionResult Index(string sortOrder, string searchString)
         {
             ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "Name_desc" : "";
             ViewBag.DateSortParm = sortOrder == "Date" ? "Date_desc" : "Date";
             var students = from s in db.Students
                            select s;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                students = students.Where(s => s.LastName.ToUpper().Contains(searchString.ToUpper())
+                                       || s.FirstMidName.ToUpper().Contains(searchString.ToUpper()));
+            }
             switch (sortOrder)
             {
                 case "Name_desc":
