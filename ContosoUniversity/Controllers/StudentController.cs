@@ -1,19 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.Entity;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using ContosoUniversity.Models;
 using ContosoUniversity.DAL;
+using ContosoUniversity.Models;
 using PagedList;
 
-namespace MvcApplication1.Controllers
+namespace ContosoUniversity.Controllers
 {
     public class StudentController : Controller
     {
-        private SchoolContext db = new SchoolContext();
+        private IStudentRepository studentRepository;
+
+        public StudentController()
+        {
+            this.studentRepository = new StudentRepository(new SchoolContext());
+        }
+
+        public StudentController(IStudentRepository studentRepository)
+        {
+            this.studentRepository = studentRepository;
+        }
 
         //
         // GET: /Student/
@@ -35,7 +42,7 @@ namespace MvcApplication1.Controllers
 
             ViewBag.CurrentFilter = searchString;
 
-            var students = from s in db.Students
+            var students = from s in studentRepository.GetStudents()
                            select s;
             if (!String.IsNullOrEmpty(searchString))
             {
@@ -68,11 +75,7 @@ namespace MvcApplication1.Controllers
 
         public ActionResult Details(int id = 0)
         {
-            Student student = db.Students.Find(id);
-            if (student == null)
-            {
-                return HttpNotFound();
-            }
+            Student student = studentRepository.GetStudentByID(id);
             return View(student);
         }
 
@@ -97,8 +100,8 @@ namespace MvcApplication1.Controllers
            {
             if (ModelState.IsValid)
             {
-                db.Students.Add(student);
-                db.SaveChanges();
+                studentRepository.InsertStudent(student);
+                studentRepository.Save();
                 return RedirectToAction("Index");
             }
            }
@@ -116,11 +119,7 @@ namespace MvcApplication1.Controllers
 
         public ActionResult Edit(int id = 0)
         {
-            Student student = db.Students.Find(id);
-            if (student == null)
-            {
-                return HttpNotFound();
-            }
+            Student student = studentRepository.GetStudentByID(id);
             return View(student);
         }
 
@@ -137,8 +136,8 @@ namespace MvcApplication1.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    db.Entry(student).State = EntityState.Modified;
-                    db.SaveChanges();
+                    studentRepository.UpdateStudent(student);
+                    studentRepository.Save();
                     return RedirectToAction("Index");
                 }
             }
@@ -159,7 +158,7 @@ namespace MvcApplication1.Controllers
             {
                 ViewBag.ErrorMessage = "Delete failed. Try again, and if the problem persists see your system administrator.";
             }
-            Student student = db.Students.Find(id);
+            Student student = studentRepository.GetStudentByID(id);
             if (student == null)
             {
                 return HttpNotFound();
@@ -176,9 +175,9 @@ namespace MvcApplication1.Controllers
         {
             try
             {
-                Student student = db.Students.Find(id);
-                db.Students.Remove(student);
-                db.SaveChanges();
+                Student student = studentRepository.GetStudentByID(id);
+                studentRepository.DeleteStudent(id);
+                studentRepository.Save();
             }
             catch (DataException/* dex */)
             {
@@ -190,7 +189,7 @@ namespace MvcApplication1.Controllers
 
         protected override void Dispose(bool disposing)
         {
-            db.Dispose();
+            studentRepository.Dispose();
             base.Dispose(disposing);
         }
     }
