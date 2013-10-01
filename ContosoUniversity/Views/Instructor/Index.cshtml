@@ -16,20 +16,21 @@
         <th>First Name</th>
         <th>Hire Date</th>
         <th>Office</th>
+        <th>Courses</th>
     </tr> 
 
     @foreach (var item in Model.Instructors) { 
         string selectedRow = ""; 
-        if (item.InstructorID == ViewBag.InstructorID) 
+        if (item.PersonID == ViewBag.PersonID) 
         { 
             selectedRow = "selectedrow"; 
         } 
         <tr class="@selectedRow" valign="top"> 
             <td> 
-                @Html.ActionLink("Select", "Index", new { id = item.InstructorID }) | 
-                @Html.ActionLink("Edit", "Edit", new { id = item.InstructorID }) | 
-                @Html.ActionLink("Details", "Details", new { id = item.InstructorID }) | 
-                @Html.ActionLink("Delete", "Delete", new { id = item.InstructorID }) 
+                @Html.ActionLink("Select", "Index", new { id = item.PersonID }) | 
+                @Html.ActionLink("Edit", "Edit", new { id = item.PersonID }) | 
+                @Html.ActionLink("Details", "Details", new { id = item.PersonID }) | 
+                @Html.ActionLink("Delete", "Delete", new { id = item.PersonID }) 
             </td> 
             <td> 
                 @item.LastName 
@@ -45,7 +46,16 @@
                 { 
                     @item.OfficeAssignment.Location  
                 } 
-            </td> 
+            </td>
+            <td>
+                @{
+        foreach (var course in item.Courses)
+        {
+                    @course.CourseID @:  @course.Title <br />
+                }
+                        }
+                    </td>
+ 
         </tr> 
     } 
 

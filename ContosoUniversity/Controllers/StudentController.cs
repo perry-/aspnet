@@ -130,7 +130,7 @@ namespace MvcApplication1.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(
-           [Bind(Include = "StudentID, LastName, FirstMidName, EnrollmentDate")]
+           [Bind(Include = "PersonID, LastName, FirstMidName, EnrollmentDate")]
             Student student)
         {
             try
